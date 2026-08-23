@@ -371,13 +371,21 @@ class RL_Users
             site_url('/verify-email')
         );
 
-        $message = sprintf(
-            "Hi %s,\r\n\r\nPlease confirm your email address to activate your Butterfly account:\r\n\r\n%s\r\n\r\nIf you didn't create this account, you can safely ignore this email.\r\n",
-            $user->display_name,
-            $verify_url
-        );
+        // Same branded HTML style as RL_Notifications' emails — a real
+        // button survives across mail clients far more reliably than a
+        // plain-text link (some render plain text as HTML and silently
+        // strip anything that looks like an unrecognized tag).
+        $body  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;">';
+        $body .= '<h2 style="color:#0f766e;margin-bottom:4px;">Confirm your email</h2>';
+        $body .= '<p style="font-size:15px;color:#111827;">Hi ' . esc_html($user->display_name) . ',</p>';
+        $body .= '<p style="font-size:15px;color:#111827;">Please confirm your email address to activate your Butterfly account.</p>';
+        $body .= '<p style="margin-top:20px;"><a href="' . esc_url($verify_url) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Confirm Email</a></p>';
+        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">If you didn\'t create this account, you can safely ignore this email.</p>';
+        $body .= '</div>';
 
-        wp_mail($user->user_email, 'Confirm your email — Butterfly', $message);
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        wp_mail($user->user_email, 'Confirm your email — Butterfly', $body, $headers);
 
         return true;
     }

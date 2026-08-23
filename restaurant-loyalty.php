@@ -138,14 +138,20 @@ function rl_custom_reset_password_email($defaults, $key, $user_login, $user_data
         site_url('/reset-password')
     );
 
-    $defaults['message'] = sprintf(
-        "Someone has requested a password reset for the following account:\r\n\r\n" .
-        "Username: %s\r\n\r\n" .
-        "If this was a mistake, ignore this email.\r\n\r\n" .
-        "To reset your password, visit the following address:\r\n\r\n%s\r\n",
-        $user_login,
-        $reset_url
-    );
+    // Same branded HTML style as RL_Notifications' emails — a real
+    // button survives across mail clients far more reliably than a
+    // plain-text link (some render plain text as HTML and silently
+    // strip anything that looks like an unrecognized tag).
+    $body  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;">';
+    $body .= '<h2 style="color:#0f766e;margin-bottom:4px;">Reset your password</h2>';
+    $body .= '<p style="font-size:15px;color:#111827;">Someone requested a password reset for the account: <strong>' . esc_html($user_login) . '</strong>.</p>';
+    $body .= '<p style="font-size:15px;color:#111827;">If this was you, click below to choose a new password.</p>';
+    $body .= '<p style="margin-top:20px;"><a href="' . esc_url($reset_url) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Reset Password</a></p>';
+    $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">If this wasn\'t you, you can safely ignore this email — your password won\'t change.</p>';
+    $body .= '</div>';
+
+    $defaults['message'] = $body;
+    $defaults['headers'] = array('Content-Type: text/html; charset=UTF-8');
 
     return $defaults;
 }
