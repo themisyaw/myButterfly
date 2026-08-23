@@ -1,0 +1,132 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * Outbound transactional emails. Currently just the lucky-draw
+ * winner notification, sent alongside the browser push notification
+ * (see RL_Draws::pick_winner() callers) so a winner finds out even
+ * if they never enabled/subscribed to push.
+ *
+ * Actual delivery depends on the site having real SMTP configured
+ * (e.g. WP Mail SMTP + a provider like Brevo) — wp_mail() without
+ * that is unreliable on most hosting and will likely fail silently
+ * or land in spam. This class doesn't care how mail gets delivered,
+ * it just calls wp_mail() the same way any WordPress email does.
+ */
+class RL_Notifications
+{
+    /**
+     * Emails a draw's winner. Two templates: a platform-branded one
+     * for the Butterfly-wide draw, and a restaurant-branded one that
+     * names the brand/location for a brand- or location-scoped draw
+     * — using the same RL_Draws::get_public_scope_label() logic the
+     * rest of the app already uses for this, so the wording matches
+     * what the customer sees on prize cards.
+     */
+    public static function send_winner_email($draw_id, $customer_id)
+    {
+        global $wpdb;
+
+        $draw_id     = absint($draw_id);
+        $customer_id = absint($customer_id);
+
+        if (!$draw_id || !$customer_id) {
+            return false;
+        }
+
+        $draw = RL_Draws::get($draw_id);
+
+        if (!$draw) {
+            return false;
+        }
+
+        $user_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT user_id FROM {$wpdb->prefix}rl_customers WHERE id = %d",
+                $customer_id
+            )
+        );
+
+        $user = $user_id ? get_userdata($user_id) : null;
+
+        if (!$user || empty($user->user_email)) {
+            return false;
+        }
+
+        $is_platform = empty($draw->brand_id);
+
+        if ($is_platform) {
+            $subject = 'You won the Butterfly giveaway! 🦋';
+            $intro   = "Great news — you're the winner of this month's Butterfly platform giveaway.";
+        } else {
+            $scope_label = RL_Draws::get_public_scope_label($draw);
+            $subject     = 'You won a prize at ' . $scope_label . '! 🎉';
+            $intro       = 'Great news — you\'re the winner of the lucky draw at <strong>' . esc_html($scope_label) . '</strong>.';
+        }
+
+        $dashboard_url = site_url('/my-entries');
+
+        $body  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;">';
+        $body .= '<h2 style="color:#0f766e;margin-bottom:4px;">' . esc_html($draw->title) . '</h2>';
+        $body .= '<p style="font-size:15px;color:#111827;">Hi ' . esc_html($user->display_name) . ',</p>';
+        $body .= '<p style="font-size:15px;color:#111827;">' . $intro . '</p>';
+
+        if (!empty($draw->prize_description)) {
+            $body .= '<p style="font-size:15px;color:#374151;background:#f8fafc;padding:14px;border-radius:12px;">' . esc_html($draw->prize_description) . '</p>';
+        }
+
+        $body .= '<p style="font-size:14px;color:#6b7280;">Check your My Entries page for details, or get in touch with the restaurant to arrange collecting your prize.</p>';
+        $body .= '<p style="margin-top:20px;"><a href="' . esc_url($dashboard_url) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">View My Entries</a></p>';
+        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">Butterfly Loyalty</p>';
+        $body .= '</div>';
+
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        return wp_mail($user->user_email, $subject, $body, $headers);
+    }
+
+    /**
+     * Generic branded email for the admin notification composer —
+     * unlike send_winner_email() there's no draw/restaurant context
+     * here, just whatever title/body the admin typed, wrapped in the
+     * same styling so it still looks like it came from the app.
+     */
+    public static function send_custom_email($customer_id, $title, $body_text)
+    {
+        global $wpdb;
+
+        $customer_id = absint($customer_id);
+
+        if (!$customer_id) {
+            return false;
+        }
+
+        $user_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT user_id FROM {$wpdb->prefix}rl_customers WHERE id = %d",
+                $customer_id
+            )
+        );
+
+        $user = $user_id ? get_userdata($user_id) : null;
+
+        if (!$user || empty($user->user_email)) {
+            return false;
+        }
+
+        $body  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;">';
+        $body .= '<h2 style="color:#0f766e;margin-bottom:4px;">' . esc_html($title) . '</h2>';
+        $body .= '<p style="font-size:15px;color:#111827;">Hi ' . esc_html($user->display_name) . ',</p>';
+        $body .= '<p style="font-size:15px;color:#374151;white-space:pre-line;">' . esc_html($body_text) . '</p>';
+        $body .= '<p style="margin-top:20px;"><a href="' . esc_url(site_url('/')) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Open Butterfly</a></p>';
+        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">Butterfly Loyalty</p>';
+        $body .= '</div>';
+
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        return wp_mail($user->user_email, $title, $body, $headers);
+    }
+}

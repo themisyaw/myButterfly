@@ -1,0 +1,31 @@
+# Minimal OpenSSL config bundled with this plugin, used as a fallback
+# for PHP's openssl_pkey_new()/openssl_sign()/openssl_pkey_derive()
+# calls in RL_Web_Push when the server's own OpenSSL installation
+# can't find its default config file — confirmed on this project's
+# LocalWP (Windows, PHP 8.2, OpenSSL 3.0.15) environment.
+#
+# The [provider_sect] block below is required on OpenSSL 3.x, not
+# just "nice to have": 3.x moved EC/RSA/etc. out of OpenSSL's core
+# into loadable "providers", and normally auto-activates the
+# "default" provider with no config needed — but supplying ANY
+# custom openssl.cnf (as this file is) switches OpenSSL into reading
+# config-driven provider activation instead of its automatic
+# fallback, so without this block explicitly turning "default" back
+# on, EC key generation fails even though the config file itself
+# loads successfully.
+
+openssl_conf = openssl_init
+
+[ openssl_init ]
+providers = provider_sect
+
+[ provider_sect ]
+default = default_sect
+
+[ default_sect ]
+activate = 1
+
+[ req ]
+distinguished_name = req_distinguished_name
+
+[ req_distinguished_name ]

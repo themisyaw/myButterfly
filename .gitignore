@@ -1,0 +1,16 @@
+# Dev tooling / internal notes — not part of the deployed plugin
+.claude/
+CLAUDE.md
+PRE-LAUNCH-AUDIT-*.md
+STATUS-*.md
+
+# Scratch/design files that ended up in the plugin root
+logo-options.png
+logo-options.svg
+
+# Build artifacts
+*.zip
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
