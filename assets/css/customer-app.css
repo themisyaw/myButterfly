@@ -430,17 +430,22 @@ body.rl-customer-app-page main {
 
 
 
-/* The actual source of the extra height: Twenty Twenty-Five wraps
-   page content in a "Group" block carrying the theme's own
-   .has-global-padding class, which adds 30px of padding-top AND
-   30px of padding-bottom independently of <main>/.entry-content
-   (confirmed via direct DOM measurement — .entry-content itself has
-   no padding of its own). That 60px was pushing the whole page
-   taller than one screen, forcing a scrollbar and making the
-   centered card look off-balance. */
-body.rl-customer-app-page main .has-global-padding,
-body.rl-customer-app-page .entry-content,
-body.rl-customer-app-page .wp-block-post-content {
+/* The actual source of the login page's extra height: Twenty
+   Twenty-Five wraps page content in a "Group" block carrying the
+   theme's own .has-global-padding class, which adds 30px of
+   padding-top AND 30px of padding-bottom independently of
+   <main>/.entry-content (confirmed via direct DOM measurement —
+   .entry-content itself has no padding of its own). That 60px was
+   pushing the login page taller than one screen.
+
+   Scoped to :has(.rl-login-page) specifically — every other app page
+   (Home, Explore, dashboard...) relies on this same padding, combined
+   with .rl-dashboard's own padding-top, to clear the fixed .rl-header
+   (82px tall, position:fixed) without its first section rendering
+   underneath it. Removing it site-wide broke that clearance. */
+body.rl-customer-app-page:has(.rl-login-page) main .has-global-padding,
+body.rl-customer-app-page:has(.rl-login-page) .entry-content,
+body.rl-customer-app-page:has(.rl-login-page) .wp-block-post-content {
 
     margin:0 !important;
     padding:0 !important;
