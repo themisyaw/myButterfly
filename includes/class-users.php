@@ -372,7 +372,7 @@ class RL_Users
         );
 
         $message = sprintf(
-            "Hi %s,\r\n\r\nPlease confirm your email address to activate your Butterfly account:\r\n\r\n<%s>\r\n\r\nIf you didn't create this account, you can safely ignore this email.\r\n",
+            "Hi %s,\r\n\r\nPlease confirm your email address to activate your Butterfly account:\r\n\r\n%s\r\n\r\nIf you didn't create this account, you can safely ignore this email.\r\n",
             $user->display_name,
             $verify_url
         );

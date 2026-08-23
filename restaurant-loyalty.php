@@ -142,7 +142,7 @@ function rl_custom_reset_password_email($defaults, $key, $user_login, $user_data
         "Someone has requested a password reset for the following account:\r\n\r\n" .
         "Username: %s\r\n\r\n" .
         "If this was a mistake, ignore this email.\r\n\r\n" .
-        "To reset your password, visit the following address:\r\n\r\n<%s>\r\n",
+        "To reset your password, visit the following address:\r\n\r\n%s\r\n",
         $user_login,
         $reset_url
     );
