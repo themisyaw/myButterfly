@@ -430,17 +430,32 @@ body.rl-customer-app-page main {
 
 
 
-/* The block-theme (Twenty Twenty-Five) content wrapper carries its
-   own "global padding" independently of <main> — the override above
-   doesn't reach it, so it was adding extra height above the login
-   card, pushing the page taller than one screen and making the
-   centered card look off-balance (all the extra space collects at
-   the top). */
+/* The actual source of the extra height: Twenty Twenty-Five wraps
+   page content in a "Group" block carrying the theme's own
+   .has-global-padding class, which adds 30px of padding-top AND
+   30px of padding-bottom independently of <main>/.entry-content
+   (confirmed via direct DOM measurement — .entry-content itself has
+   no padding of its own). That 60px was pushing the whole page
+   taller than one screen, forcing a scrollbar and making the
+   centered card look off-balance. */
+body.rl-customer-app-page main .has-global-padding,
 body.rl-customer-app-page .entry-content,
 body.rl-customer-app-page .wp-block-post-content {
 
     margin:0 !important;
     padding:0 !important;
+
+}
+
+
+
+/* The login page fully centers itself (see .rl-login-page below) and
+   doesn't need the app-wide top breathing room every other app page
+   gets from .rl-customer-app-page's own padding-top — that 20px was
+   the last bit pushing this specific page taller than one viewport. */
+body.rl-customer-app-page:has(.rl-login-page) {
+
+    padding-top:0 !important;
 
 }
 
