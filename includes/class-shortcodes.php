@@ -1416,6 +1416,16 @@ class RL_Shortcodes
 {
     if (!is_user_logged_in()) {
 
+        // This page issues a fresh per-visit cookie (RL_Google_Auth::
+        // get_authorize_url()'s CSRF state binding) on every render —
+        // caching it anywhere (CDN, browser, a caching plugin) means a
+        // visitor gets served someone else's already-used state value
+        // with no matching cookie, and Google sign-in fails with a
+        // generic "sign-in failed" error that looks like a real bug
+        // rather than a stale cache. nocache_headers() tells any
+        // well-behaved cache layer to leave this response alone.
+        nocache_headers();
+
         $error_message    = '';
         $unverified_email = '';
         $resend_success   = false;
