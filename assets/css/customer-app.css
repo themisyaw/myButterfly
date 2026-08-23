@@ -1478,7 +1478,15 @@ LOGIN PAGE
 
 .rl-login-page{
 
+    /* 100vh is fixed to the browser's largest possible viewport, but
+       mobile browsers show/hide their address bar as you scroll —
+       the visible area changes while 100vh doesn't, causing the page
+       to visibly jump. 100dvh tracks the actual visible viewport;
+       100vh above is kept as a fallback for browsers that don't
+       support dvh yet (this line is simply ignored by those that do,
+       since the later declaration wins the cascade). */
     min-height:100vh;
+    min-height:100dvh;
 
     background:#f8fafc;
 
