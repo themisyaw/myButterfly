@@ -1417,14 +1417,26 @@ class RL_Shortcodes
     if (!is_user_logged_in()) {
 
         // This page issues a fresh per-visit cookie (RL_Google_Auth::
-        // get_authorize_url()'s CSRF state binding) on every render —
-        // caching it anywhere (CDN, browser, a caching plugin) means a
-        // visitor gets served someone else's already-used state value
-        // with no matching cookie, and Google sign-in fails with a
-        // generic "sign-in failed" error that looks like a real bug
-        // rather than a stale cache. nocache_headers() tells any
-        // well-behaved cache layer to leave this response alone.
+        // get_authorize_url()'s CSRF state binding) and a fresh WP
+        // login nonce on every render — caching it anywhere (CDN,
+        // browser, a caching plugin) means a visitor gets served a
+        // stale, already-superseded token: Google sign-in fails with
+        // a generic "sign-in failed" error, and a plain username/
+        // password login fails its nonce check on the first attempt
+        // (then works on retry, since the failed-attempt response
+        // itself isn't cached and carries a fresh nonce) — both look
+        // like real bugs rather than a stale cache.
+        //
+        // nocache_headers() covers well-behaved layers that respect
+        // standard Cache-Control headers (confirmed working against
+        // Hostinger's CDN). LiteSpeed Cache (the WordPress plugin)
+        // does NOT reliably honor it on this host and kept re-caching
+        // this page anyway — it needs to be told directly via its own
+        // API, which this second call does. Safe to call even when
+        // LiteSpeed Cache isn't installed (do_action on a hook with
+        // no listeners is a no-op).
         nocache_headers();
+        do_action('litespeed_control_set_nocache', 'rl_login_page_dynamic_tokens');
 
         $error_message    = '';
         $unverified_email = '';
