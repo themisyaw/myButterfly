@@ -713,7 +713,7 @@ class RL_Shortcodes
 
                             <div class="rl-reward-image">
                                 <?php if (!empty($item->image)): ?>
-                                    <img src="<?php echo esc_url($item->image); ?>" alt="<?php echo esc_attr($item->title); ?>">
+                                    <img src="<?php echo esc_url($item->image); ?>" alt="<?php echo esc_attr($item->title); ?>" loading="lazy" decoding="async">
                                 <?php else: ?>
                                     <span class="rl-reward-image-fallback">🎁</span>
                                 <?php endif; ?>
@@ -1302,7 +1302,7 @@ class RL_Shortcodes
 
                                 <div class="rl-restaurant-card-photo">
                                     <?php if (!empty($loc->brand_logo)): ?>
-                                        <img src="<?php echo esc_url($loc->brand_logo); ?>" alt="">
+                                        <img src="<?php echo esc_url($loc->brand_logo); ?>" alt="" loading="lazy" decoding="async">
                                     <?php else: ?>
                                         <span class="rl-restaurant-card-photo-fallback dashicons dashicons-store"></span>
                                     <?php endif; ?>
@@ -2432,7 +2432,7 @@ $parts = explode('.', number_format($points, 2, '.', ''));
 
                                         <div class="rl-restaurant-card-photo">
                                             <?php if (!empty($wallet->brand_logo)): ?>
-                                                <img src="<?php echo esc_url($wallet->brand_logo); ?>" alt="">
+                                                <img src="<?php echo esc_url($wallet->brand_logo); ?>" alt="" loading="lazy" decoding="async">
                                             <?php else: ?>
                                                 <span class="rl-restaurant-card-photo-fallback dashicons dashicons-store"></span>
                                             <?php endif; ?>
@@ -2614,7 +2614,7 @@ $parts = explode('.', number_format($points, 2, '.', ''));
                                 <a class="rl-home-explore-card" href="<?php echo esc_url(site_url('/restaurant/?id=' . intval($ex_loc->id))); ?>">
                                     <div class="rl-restaurant-card-photo">
                                         <?php if (!empty($ex_loc->brand_logo)): ?>
-                                            <img src="<?php echo esc_url($ex_loc->brand_logo); ?>" alt="">
+                                            <img src="<?php echo esc_url($ex_loc->brand_logo); ?>" alt="" loading="lazy" decoding="async">
                                         <?php else: ?>
                                             <span class="rl-restaurant-card-photo-fallback dashicons dashicons-store"></span>
                                         <?php endif; ?>
