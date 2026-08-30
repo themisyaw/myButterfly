@@ -64,6 +64,7 @@ class RL_DB
             description text NULL,
             pool_points tinyint(1) NOT NULL DEFAULT 0,
             pool_entries tinyint(1) NOT NULL DEFAULT 0,
+            prizes_enabled tinyint(1) NOT NULL DEFAULT 0,
             opening_time time NULL,
             closing_time time NULL,
             status varchar(20) NOT NULL DEFAULT 'active',

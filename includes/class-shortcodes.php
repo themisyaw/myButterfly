@@ -413,7 +413,20 @@ class RL_Shortcodes
             <span>Reward Menus</span>
         </a>
 
-        <?php if (current_user_can('administrator')): ?>
+        <?php
+        // Lucky Draws is an opt-in extra feature, toggled per-brand
+        // by an admin (RL_Brands_Admin's "Enable Lucky Draws for this
+        // restaurant" checkbox) — administrators always see it
+        // (they manage every brand's draws from wp-admin regardless),
+        // a brand manager only if their own specific brand has it on.
+        $show_lucky_draws = current_user_can('administrator');
+
+        if (!$show_lucky_draws) {
+            $nav_brand        = RL_Brands::get_by_manager(get_current_user_id());
+            $show_lucky_draws = $nav_brand && !empty($nav_brand->prizes_enabled);
+        }
+        ?>
+        <?php if ($show_lucky_draws): ?>
             <a href="<?php echo esc_url(site_url('/manage-draws')); ?>" class="rl-sheet-item">
                 <span class="dashicons dashicons-awards"></span>
                 <span>Lucky Draws</span>

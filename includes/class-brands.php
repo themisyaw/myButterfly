@@ -18,11 +18,12 @@ class RL_Brands
     {
         global $wpdb;
 
-        $name         = sanitize_text_field($data['name'] ?? '');
-        $description  = sanitize_textarea_field($data['description'] ?? '');
-        $logo         = esc_url_raw($data['logo'] ?? '');
-        $pool_points  = !empty($data['pool_points']) ? 1 : 0;
-        $pool_entries = !empty($data['pool_entries']) ? 1 : 0;
+        $name           = sanitize_text_field($data['name'] ?? '');
+        $description    = sanitize_textarea_field($data['description'] ?? '');
+        $logo           = esc_url_raw($data['logo'] ?? '');
+        $pool_points    = !empty($data['pool_points']) ? 1 : 0;
+        $pool_entries   = !empty($data['pool_entries']) ? 1 : 0;
+        $prizes_enabled = !empty($data['prizes_enabled']) ? 1 : 0;
 
         if (empty($name)) {
             return false;
@@ -33,14 +34,15 @@ class RL_Brands
         $inserted = $wpdb->insert(
             $table,
             array(
-                'name'         => $name,
-                'description'  => $description,
-                'logo'         => $logo,
-                'pool_points'  => $pool_points,
-                'pool_entries' => $pool_entries,
-                'status'       => 'active',
+                'name'           => $name,
+                'description'    => $description,
+                'logo'           => $logo,
+                'pool_points'    => $pool_points,
+                'pool_entries'   => $pool_entries,
+                'prizes_enabled' => $prizes_enabled,
+                'status'         => 'active',
             ),
-            array('%s', '%s', '%s', '%d', '%d', '%s')
+            array('%s', '%s', '%s', '%d', '%d', '%d', '%s')
         );
 
         if (!$inserted) {
@@ -88,6 +90,18 @@ class RL_Brands
         if (isset($data['pool_entries'])) {
             $clean['pool_entries'] = !empty($data['pool_entries']) ? 1 : 0;
             $format[]               = '%d';
+        }
+
+        // Deliberately only ever set by admin-facing code paths — see
+        // the can_manage_brand()-gated $is_admin checks in
+        // admin/class-brands-admin.php before this key is ever
+        // included in $data. A brand manager's own edit forms never
+        // submit this field, so it's never at risk from a crafted
+        // POST either — nothing here re-checks the caller's role,
+        // that enforcement lives entirely at the caller.
+        if (isset($data['prizes_enabled'])) {
+            $clean['prizes_enabled'] = !empty($data['prizes_enabled']) ? 1 : 0;
+            $format[]                 = '%d';
         }
 
         if (isset($data['status'])) {

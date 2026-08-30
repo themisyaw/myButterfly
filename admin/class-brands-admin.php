@@ -129,11 +129,15 @@ class RL_Brands_Admin
                     // across locations (the common case for a chain);
                     // a manager can turn that off later in Brand Settings.
                     $brand_id = RL_Brands::create(array(
-                        'name'         => $_POST['name'] ?? '',
-                        'description'  => $_POST['description'] ?? '',
-                        'logo'         => $_POST['logo'] ?? '',
-                        'pool_points'  => true,
-                        'pool_entries' => false,
+                        'name'           => $_POST['name'] ?? '',
+                        'description'    => $_POST['description'] ?? '',
+                        'logo'           => $_POST['logo'] ?? '',
+                        'pool_points'    => true,
+                        'pool_entries'   => false,
+                        // Admin-only field — $is_admin is already
+                        // required to reach this handler at all (see
+                        // the outer `if ($is_admin && ...)` above).
+                        'prizes_enabled' => !empty($_POST['prizes_enabled']),
                     ));
 
                     if ($brand_id) {
@@ -227,13 +231,24 @@ class RL_Brands_Admin
 
             if ($this->can_manage_brand($brand_id, $is_admin)) {
 
-                RL_Brands::update($brand_id, array(
+                $update_data = array(
                     'name'         => $_POST['name'] ?? '',
                     'description'  => $_POST['description'] ?? '',
                     'logo'         => $_POST['logo'] ?? '',
                     'pool_points'  => !empty($_POST['pool_points']),
                     'pool_entries' => !empty($_POST['pool_entries']),
-                ));
+                );
+
+                // Only ever settable by an admin — a brand's own
+                // manager can reach this same handler, but the key is
+                // simply never included in $data for them, so
+                // RL_Brands::update()'s isset() check leaves the
+                // brand's current value untouched either way.
+                if ($is_admin) {
+                    $update_data['prizes_enabled'] = !empty($_POST['prizes_enabled']);
+                }
+
+                RL_Brands::update($brand_id, $update_data);
 
                 RL_Brand_Hours::save_for_brand($brand_id, $_POST['hours'] ?? array());
 
@@ -254,11 +269,20 @@ class RL_Brands_Admin
 
                 $name = sanitize_text_field($_POST['name'] ?? '');
 
-                RL_Brands::update($brand_id, array(
+                $update_data = array(
                     'name'        => $name,
                     'description' => $_POST['description'] ?? '',
                     'logo'        => $_POST['logo'] ?? '',
-                ));
+                );
+
+                // See the matching comment on the rl_update_brand
+                // handler above — admin-only, silently no-op for a
+                // brand's own manager rather than rejected.
+                if ($is_admin) {
+                    $update_data['prizes_enabled'] = !empty($_POST['prizes_enabled']);
+                }
+
+                RL_Brands::update($brand_id, $update_data);
 
                 RL_Brand_Hours::save_for_brand($brand_id, $_POST['hours'] ?? array());
 
@@ -461,6 +485,13 @@ class RL_Brands_Admin
                             <p class="description">Image URL — shown as the cover photo on Explore and this restaurant's own page.</p>
                         </td>
                     </tr>
+                    <tr>
+                        <th>Lucky Draws</th>
+                        <td>
+                            <label><input type="checkbox" name="prizes_enabled" value="1"> Enable Lucky Draws for this restaurant</label>
+                            <p class="description">Optional extra feature — when on, this restaurant's manager can create and run their own prize draws. Off by default; you can turn it on later from this restaurant's own management page too.</p>
+                        </td>
+                    </tr>
                     <?php $this->render_hours_fields(0); ?>
                     <tr>
                         <th>Manager</th>
@@ -492,7 +523,7 @@ class RL_Brands_Admin
 
             <?php if (!$is_chain): ?>
 
-                <?php $this->render_single_restaurant_form($brand, $locations); ?>
+                <?php $this->render_single_restaurant_form($brand, $locations, $is_admin); ?>
 
             <?php else: ?>
 
@@ -525,6 +556,15 @@ class RL_Brands_Admin
                             <label><input type="checkbox" name="pool_entries" value="1" <?php checked($brand->pool_entries, 1); ?>> Share lucky-draw entries across all locations</label>
                         </td>
                     </tr>
+                    <?php if ($is_admin): ?>
+                    <tr>
+                        <th>Lucky Draws</th>
+                        <td>
+                            <label><input type="checkbox" name="prizes_enabled" value="1" <?php checked($brand->prizes_enabled ?? 0, 1); ?>> Enable Lucky Draws for this restaurant</label>
+                            <p class="description">Optional extra feature — when on, this restaurant's manager can create and run their own prize draws.</p>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
                 </table>
                 <button type="submit" name="rl_update_brand" class="button button-primary">Save Settings</button>
             </form>
@@ -684,7 +724,7 @@ class RL_Brands_Admin
      * chain by adding a second location — at which point render_brand()
      * switches to the full chain UI on the next page load.
      */
-    private function render_single_restaurant_form($brand, $locations)
+    private function render_single_restaurant_form($brand, $locations, $is_admin)
     {
         $location = !empty($locations) ? $locations[0] : null;
         ?>
@@ -722,6 +762,15 @@ class RL_Brands_Admin
                         <p class="description">Image URL — shown as the cover photo on Explore and this restaurant's own page.</p>
                     </td>
                 </tr>
+                <?php if ($is_admin): ?>
+                <tr>
+                    <th>Lucky Draws</th>
+                    <td>
+                        <label><input type="checkbox" name="prizes_enabled" value="1" <?php checked($brand->prizes_enabled ?? 0, 1); ?>> Enable Lucky Draws for this restaurant</label>
+                        <p class="description">Optional extra feature — when on, this restaurant's manager can create and run their own prize draws.</p>
+                    </td>
+                </tr>
+                <?php endif; ?>
                 <?php $this->render_hours_fields($brand->id); ?>
             </table>
             <button type="submit" name="rl_update_single_restaurant" class="button button-primary">Save Details</button>

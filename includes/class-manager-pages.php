@@ -912,16 +912,24 @@ class RL_Manager_Pages
 
         $is_admin = current_user_can('administrator');
 
-        // Temporarily brand-manager-facing-UI-only removal (not a
-        // permanent takedown — the wp-admin Lucky Draws screen and
-        // this page's own code are untouched): brand managers land
-        // here without the nav link too, but this direct-URL guard
-        // is the actual enforcement point.
-        if (!$is_admin) {
-            return $this->render_page_shell('Lucky Draws', '', '<p>Lucky Draws isn\'t available here yet — check back soon.</p>');
-        }
-
         $brand = RL_Brands::get_by_manager(get_current_user_id());
+
+        if (!$is_admin) {
+
+            if (!$brand) {
+                return $this->render_page_shell('Lucky Draws', '', '<p>No brand is assigned to you yet. Contact an administrator.</p>');
+            }
+
+            // Lucky Draws is an opt-in extra feature, toggled per-brand
+            // by an admin (RL_Brands_Admin's "Enable Lucky Draws for
+            // this restaurant" checkbox) — off by default. The nav
+            // link is already hidden when it's off (see
+            // RL_Shortcodes::render_manager_bottom_nav()), but this
+            // direct-URL guard is the actual enforcement point.
+            if (empty($brand->prizes_enabled)) {
+                return $this->render_page_shell('Lucky Draws', '', '<p>Lucky Draws isn\'t enabled for your restaurant yet — contact an administrator if you\'d like to turn it on.</p>');
+            }
+        }
 
         if (!$brand) {
             return $this->render_page_shell('Lucky Draws', '', '<p>No brand is assigned to you yet. Contact an administrator.</p>');
