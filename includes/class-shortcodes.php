@@ -2334,25 +2334,17 @@ $points = floatval($total_points);
 $parts = explode('.', number_format($points, 2, '.', ''));
 ?>
 
-<div class="rl-header-points-stack">
-    <div class="rl-header-points">
-        <div class="points-badge-wrapper">
-            <div class="points-circle">
-                <span class="points-number">
-                    <?php echo $parts[0]; ?>.<small><?php echo $parts[1]; ?></small>
-                </span>
+<div class="rl-header-points">
+    <div class="points-badge-wrapper">
+        <div class="points-circle">
+            <span class="points-number">
+                <?php echo $parts[0]; ?>.<small><?php echo $parts[1]; ?></small>
+            </span>
 
-                <div class="points-tag">
-                    <span class="tag-text rl-points-icon">⭐</span>
-                </div>
+            <div class="points-tag">
+                <span class="tag-text rl-points-icon">⭐</span>
             </div>
         </div>
-    </div>
-
-    <div class="rl-entries-badge" id="rl-header-entries-badge" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>">
-        <span class="dashicons dashicons-tickets-alt"></span>
-        <span id="rl-header-entries-count"><?php echo intval($active_entries_count); ?></span>
-        <span id="rl-header-entries-label"><?php echo esc_html($active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural')); ?></span>
     </div>
 </div>
 
@@ -2389,6 +2381,13 @@ $parts = explode('.', number_format($points, 2, '.', ''));
             </div>
 
             <div id="rl-home-tab" class="rl-tab active">
+
+                <div class="rl-entries-badge" id="rl-header-entries-badge" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>">
+                    <span class="dashicons dashicons-tickets-alt"></span>
+                    <span id="rl-header-entries-count"><?php echo intval($active_entries_count); ?></span>
+                    <span id="rl-header-entries-label"><?php echo esc_html($active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural')); ?></span>
+                </div>
+
                 <div class="rl-rewards">
 
                     <?php echo $this->render_big_prize_card($customer->id); ?>
