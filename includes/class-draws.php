@@ -300,6 +300,13 @@ class RL_Draws
 
         $wpdb->delete($wpdb->prefix . 'rl_draw_locations', array('draw_id' => $id), array('%d'));
 
+        // Entry rows aren't shown anywhere once their draw is gone
+        // (every entries query INNER JOINs to rl_draws, so an orphan
+        // just silently drops out of the results) — but leaving them
+        // in the table forever is still dead data with no cleanup
+        // path. Delete them explicitly, same as the locations above.
+        $wpdb->delete($wpdb->prefix . 'rl_draw_entries', array('draw_id' => $id), array('%d'));
+
         return $wpdb->delete($table, array('id' => $id), array('%d'));
     }
 

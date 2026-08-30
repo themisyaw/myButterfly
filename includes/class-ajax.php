@@ -545,10 +545,21 @@ class RL_Ajax
             );
         }
 
+        // Same "active" definition as the My Entries page's
+        // Active/Ended split — see the matching comment in
+        // RL_Shortcodes::dashboard() where this is also computed for
+        // the initial page load.
+        $active_entries_count = 0;
+        foreach (RL_Draws::get_customer_active_entries($customer_id) as $entry_row) {
+            $active_entries_count += intval($entry_row->entry_count);
+        }
+
         wp_send_json(array(
-            'success'      => true,
-            'total_points' => round($total_points, 2),
-            'wallets'      => $wallets,
+            'success'             => true,
+            'total_points'        => round($total_points, 2),
+            'wallets'             => $wallets,
+            'active_entries'      => $active_entries_count,
+            'entries_label'       => $active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural'),
         ));
 
     }

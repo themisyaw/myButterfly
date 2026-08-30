@@ -1378,6 +1378,40 @@ HEADER
   display: block;
 }
 
+/* Wraps the existing .rl-header-points (untouched) plus the entries
+   badge underneath it — .rl-header-points already centers its own
+   single child via inline-flex, this just stacks the two vertically
+   without touching that. */
+.rl-header-points-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Deliberately smaller/quieter than the points badge — a secondary
+   stat, not a second thing competing for attention. Hidden via
+   inline style when the count is zero (both on initial page load and
+   from the live-refresh JS), rather than shown as an empty "0". */
+.rl-entries-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e1f5ee;
+  color: #085041;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.rl-entries-badge .dashicons {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+}
+
 /* ===========================
 MORE MENU
 =========================== */

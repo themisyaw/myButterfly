@@ -2114,6 +2114,19 @@ class RL_Shortcodes
 
 
 
+        // Sum of entry_count across every draw this customer currently
+        // has entries in — reuses the exact same "active" definition
+        // (status='active' AND within the date window) that the My
+        // Entries page's Active/Ended split already uses, rather than
+        // a second copy of that logic. A draw that ends drops its
+        // entries out of this count on its own (they just stop
+        // matching that WHERE clause); a deleted draw's entries are
+        // now explicitly removed by RL_Draws::delete() too.
+        $active_entries_count = 0;
+        foreach (RL_Draws::get_customer_active_entries($customer->id) as $entry_row) {
+            $active_entries_count += intval($entry_row->entry_count);
+        }
+
         /*
         =========================
         GET TRANSACTIONS
@@ -2321,20 +2334,28 @@ $points = floatval($total_points);
 $parts = explode('.', number_format($points, 2, '.', ''));
 ?>
 
-<div class="rl-header-points">
-    <div class="points-badge-wrapper">
-        <div class="points-circle">
-            <span class="points-number">
-                <?php echo $parts[0]; ?>.<small><?php echo $parts[1]; ?></small>
-            </span>
-            
-            <div class="points-tag">
-                <span class="tag-text rl-points-icon">⭐</span>
+<div class="rl-header-points-stack">
+    <div class="rl-header-points">
+        <div class="points-badge-wrapper">
+            <div class="points-circle">
+                <span class="points-number">
+                    <?php echo $parts[0]; ?>.<small><?php echo $parts[1]; ?></small>
+                </span>
+
+                <div class="points-tag">
+                    <span class="tag-text rl-points-icon">⭐</span>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="rl-entries-badge" id="rl-header-entries-badge" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>">
+        <span class="dashicons dashicons-tickets-alt"></span>
+        <span id="rl-header-entries-count"><?php echo intval($active_entries_count); ?></span>
+        <span id="rl-header-entries-label"><?php echo esc_html($active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural')); ?></span>
+    </div>
 </div>
-                
+
 
                 
 
