@@ -498,7 +498,7 @@ class RL_Draws
                 continue;
             }
 
-            $wpdb->insert(
+            $inserted = $wpdb->insert(
                 $entries_table,
                 array(
                     'draw_id'        => $draw->id,
@@ -507,6 +507,28 @@ class RL_Draws
                 ),
                 array('%d', '%d', '%d')
             );
+
+            // Notify right away, same as pick_winner() — push first
+            // (best-effort, only reaches them if they're subscribed)
+            // then email (reaches their inbox regardless). Deliberately
+            // one notification per matched draw, not one combined
+            // notification per transaction — a single purchase can
+            // land entries in more than one draw at once (e.g. a
+            // location draw and the platform-wide giveaway together),
+            // and each is its own distinct thing worth knowing about.
+            if ($inserted && class_exists('RL_Notifications')) {
+
+                RL_Notifications::send_entry_email($draw->id, $customer_id);
+
+                if (class_exists('RL_Push_Subscriptions')) {
+                    RL_Push_Subscriptions::send_to_customers(
+                        array($customer_id),
+                        'New entry! 🎟️',
+                        'You\'re entered in "' . $draw->title . '" — good luck!',
+                        site_url('/my-entries')
+                    );
+                }
+            }
         }
     }
 

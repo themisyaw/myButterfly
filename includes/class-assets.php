@@ -30,6 +30,11 @@ class RL_Assets
             'customer',
             $user->roles
         )
+        ||
+        in_array(
+            'brand_manager',
+            $user->roles
+        )
     ){
 
         if(

@@ -89,6 +89,75 @@ class RL_Notifications
     }
 
     /**
+     * Emails a customer the moment they earn a new lucky-draw entry —
+     * called once per matched draw from RL_Draws::
+     * process_entries_for_transaction(), right after the entry row
+     * itself is inserted. Same two-template split as
+     * send_winner_email() (platform-wide vs. brand/location-scoped
+     * wording), deliberately not the winner template itself — this is
+     * "you're in the running," not "you won."
+     */
+    public static function send_entry_email($draw_id, $customer_id)
+    {
+        global $wpdb;
+
+        $draw_id     = absint($draw_id);
+        $customer_id = absint($customer_id);
+
+        if (!$draw_id || !$customer_id) {
+            return false;
+        }
+
+        $draw = RL_Draws::get($draw_id);
+
+        if (!$draw) {
+            return false;
+        }
+
+        $user_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT user_id FROM {$wpdb->prefix}rl_customers WHERE id = %d",
+                $customer_id
+            )
+        );
+
+        $user = $user_id ? get_userdata($user_id) : null;
+
+        if (!$user || empty($user->user_email)) {
+            return false;
+        }
+
+        $is_platform = empty($draw->brand_id);
+
+        if ($is_platform) {
+            $subject = "You're entered! 🎟️";
+            $intro   = "Nice — that purchase just earned you an entry into the Butterfly platform giveaway.";
+        } else {
+            $scope_label = RL_Draws::get_public_scope_label($draw);
+            $subject     = "You're entered at " . $scope_label . "! 🎟️";
+            $intro       = 'Nice — that purchase just earned you an entry into the lucky draw at <strong>' . esc_html($scope_label) . '</strong>.';
+        }
+
+        $body  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;">';
+        $body .= '<h2 style="color:#0f766e;margin-bottom:4px;">' . esc_html($draw->title) . '</h2>';
+        $body .= '<p style="font-size:15px;color:#111827;">Hi ' . esc_html($user->display_name) . ',</p>';
+        $body .= '<p style="font-size:15px;color:#111827;">' . $intro . '</p>';
+
+        if (!empty($draw->prize_description)) {
+            $body .= '<p style="font-size:15px;color:#374151;background:#f8fafc;padding:14px;border-radius:12px;">' . esc_html($draw->prize_description) . '</p>';
+        }
+
+        $body .= '<p style="font-size:14px;color:#6b7280;">Keep earning points for more entries — check My Entries any time to see where you stand.</p>';
+        $body .= '<p style="margin-top:20px;"><a href="' . esc_url(site_url('/my-entries')) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">View My Entries</a></p>';
+        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">Butterfly Loyalty</p>';
+        $body .= '</div>';
+
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        return wp_mail($user->user_email, $subject, $body, $headers);
+    }
+
+    /**
      * Generic branded email for the admin notification composer —
      * unlike send_winner_email() there's no draw/restaurant context
      * here, just whatever title/body the admin typed, wrapped in the
