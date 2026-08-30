@@ -103,7 +103,112 @@ tabs.forEach(function(button){
         }
 
 
+        if(tab === "home"){
+
+            refreshHomePoints();
+
+        }
+
+
     });
+
+});
+
+
+
+/* ===========================
+HOME TAB — REFRESH POINTS ON RETURN
+A staff member can add points to this customer while this exact
+page/tab is already open (it happened while they were on the QR tab
+having their code scanned, or just backgrounded) — nothing here
+re-fetches on its own otherwise, since tab-switching above is purely
+client-side and every tab's content was rendered once at page load.
+Re-fetches just the raw point counts (not full markup — the Home
+tab's cards carry real business logic, next-reward targets, progress
+bars, "ready to redeem" chips, that isn't worth re-implementing here
+a second time) and patches them into the header total + each
+restaurant card's badge, whenever the customer taps back to Home or
+the app regains focus while already there.
+=========================== */
+
+
+let rlHomeRefreshInFlight = false;
+let rlHomeRefreshLastRun = 0;
+const RL_HOME_REFRESH_MIN_INTERVAL_MS = 3000;
+
+function refreshHomePoints(){
+
+    if(typeof RL_HOME_REFRESH === "undefined") return;
+
+    if(rlHomeRefreshInFlight) return;
+
+    let now = Date.now();
+
+    if(now - rlHomeRefreshLastRun < RL_HOME_REFRESH_MIN_INTERVAL_MS) return;
+
+    rlHomeRefreshLastRun = now;
+    rlHomeRefreshInFlight = true;
+
+    fetch(RL_HOME_REFRESH.ajaxUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body:
+            "action=rl_customer_points_summary" +
+            "&nonce=" + encodeURIComponent(RL_HOME_REFRESH.nonce)
+    })
+    .then(function(response){ return response.json(); })
+    .then(function(data){
+
+        if(!data || !data.success) return;
+
+        let headerPointsNumber = document.querySelector(".rl-header-points .points-number");
+
+        if(headerPointsNumber){
+
+            let parts = Number(data.total_points).toFixed(2).split(".");
+            headerPointsNumber.innerHTML = parts[0] + ".<small>" + parts[1] + "</small>";
+
+        }
+
+        (data.wallets || []).forEach(function(wallet){
+
+            let badge = document.querySelector(
+                '.rl-reward-price[data-scope-type="' + wallet.scope_type + '"][data-scope-id="' + wallet.scope_id + '"]'
+            );
+
+            if(badge){
+
+                let points = Number(wallet.points);
+                let display = Number.isInteger(points) ? points : points.toFixed(2);
+                badge.textContent = "⭐ " + display;
+
+            }
+
+        });
+
+    })
+    .catch(function(){
+        // Silent — this is a background convenience refresh, not
+        // something worth surfacing an error toast for. Worst case,
+        // the number stays as it was until the next tap/focus.
+    })
+    .finally(function(){
+        rlHomeRefreshInFlight = false;
+    });
+
+}
+
+document.addEventListener("visibilitychange", function(){
+
+    if(document.visibilityState !== "visible") return;
+
+    let homeTab = document.getElementById("rl-home-tab");
+
+    if(homeTab && homeTab.classList.contains("active")){
+
+        refreshHomePoints();
+
+    }
 
 });
 

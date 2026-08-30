@@ -998,6 +998,19 @@ html, body {
 
         );
 
+        wp_localize_script(
+
+            'rl-customer-tabs',
+
+            'RL_HOME_REFRESH',
+
+            array(
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('rl_ajax_nonce'),
+            )
+
+        );
+
 
         /*
         =========================

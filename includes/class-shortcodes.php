@@ -2461,7 +2461,7 @@ $parts = explode('.', number_format($points, 2, '.', ''));
                                                     <?php endif; ?>
                                                 </h4>
 
-                                                <div class="rl-reward-price">⭐ <?php echo intval($wallet->points); ?></div>
+                                                <div class="rl-reward-price" data-scope-type="<?php echo esc_attr($wallet->scope_type); ?>" data-scope-id="<?php echo esc_attr($wallet->scope_type === 'brand' ? $wallet->brand_id : $wallet->location_id); ?>">⭐ <?php echo intval($wallet->points); ?></div>
                                             </div>
 
                                             <?php if (!empty($single_location->address)): ?>
@@ -2539,7 +2539,7 @@ $parts = explode('.', number_format($points, 2, '.', ''));
 
                                         <div class="rl-reward-top">
                                             <h4><?php echo esc_html($wallet->brand_name); ?></h4>
-                                            <div class="rl-reward-price">⭐ <?php echo intval($wallet->points); ?></div>
+                                            <div class="rl-reward-price" data-scope-type="<?php echo esc_attr($wallet->scope_type); ?>" data-scope-id="<?php echo esc_attr($wallet->scope_type === 'brand' ? $wallet->brand_id : $wallet->location_id); ?>">⭐ <?php echo intval($wallet->points); ?></div>
                                         </div>
 
                                         <?php if($locations): ?>

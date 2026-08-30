@@ -51,6 +51,11 @@ class RL_Ajax
             array($this, 'mark_notify_prompted')
         );
 
+        add_action(
+            'wp_ajax_rl_customer_points_summary',
+            array($this, 'customer_points_summary')
+        );
+
     }
 
 
@@ -493,6 +498,57 @@ class RL_Ajax
 
         wp_send_json(array(
             'success' => true
+        ));
+
+    }
+
+    /**
+     * Fresh points totals for the logged-in customer's own Home tab —
+     * called from customer-tabs.js whenever they tap back to Home (or
+     * the app regains focus while already there), so a balance a
+     * staff member just added while the tab sat in the background/
+     * on-screen isn't stuck showing what it was at page load. Returns
+     * plain numbers only, not re-rendered HTML — the Home tab's cards
+     * have real business logic (next-reward targets, progress bars,
+     * "ready to redeem" chips) that depends on this same data, and
+     * duplicating that in JS would be a second place for it to drift
+     * out of sync with class-shortcodes.php's dashboard(). Those stay
+     * as they were at page load; only the raw point counts (header
+     * total + each restaurant card's badge) get patched in place.
+     */
+    public function customer_points_summary()
+    {
+
+        $this->customer_security_check();
+
+        $customer_id = RL_Users::ensure_customer_identity(get_current_user_id());
+
+        if (!$customer_id) {
+            wp_send_json(array(
+                'success' => false,
+                'message' => 'Customer profile not found'
+            ));
+        }
+
+        $balances = RL_Points::get_all_balances_for_customer($customer_id);
+
+        $total_points = 0;
+        $wallets      = array();
+
+        foreach ($balances as $wallet) {
+            $total_points += floatval($wallet->points);
+
+            $wallets[] = array(
+                'scope_type' => $wallet->scope_type,
+                'scope_id'   => intval($wallet->scope_type === 'brand' ? $wallet->brand_id : $wallet->location_id),
+                'points'     => floatval($wallet->points),
+            );
+        }
+
+        wp_send_json(array(
+            'success'      => true,
+            'total_points' => round($total_points, 2),
+            'wallets'      => $wallets,
         ));
 
     }
