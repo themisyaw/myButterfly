@@ -2362,10 +2362,11 @@ $parts = explode('.', number_format($points, 2, '.', ''));
 
 
             <div class="rl-quick-actions">
-                <button type="button" class="rl-quick-action" data-tab="qr">
-                    <span class="dashicons dashicons-camera-alt"></span>
-                    <span><?php echo esc_html(rl_t('home_quick_scan')); ?></span>
-                </button>
+                <a href="<?php echo esc_url(site_url('/my-entries')); ?>" class="rl-quick-action" id="rl-quick-action-entries">
+                    <span class="dashicons dashicons-tickets-alt"></span>
+                    <span><?php echo esc_html(rl_t('home_quick_entries')); ?></span>
+                    <span class="rl-quick-action-count" id="rl-quick-action-entries-count" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>"><?php echo intval($active_entries_count); ?></span>
+                </a>
                 <button type="button" class="rl-quick-action" data-tab="prizes">
                     <span class="dashicons dashicons-tickets-alt"></span>
                     <span><?php echo esc_html(rl_t('home_quick_prizes')); ?></span>
@@ -2381,12 +2382,6 @@ $parts = explode('.', number_format($points, 2, '.', ''));
             </div>
 
             <div id="rl-home-tab" class="rl-tab active">
-
-                <div class="rl-entries-badge" id="rl-header-entries-badge" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>">
-                    <span class="dashicons dashicons-tickets-alt"></span>
-                    <span id="rl-header-entries-count"><?php echo intval($active_entries_count); ?></span>
-                    <span id="rl-header-entries-label"><?php echo esc_html($active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural')); ?></span>
-                </div>
 
                 <div class="rl-rewards">
 
@@ -2627,6 +2622,12 @@ $parts = explode('.', number_format($points, 2, '.', ''));
                     <?php endif; ?>
 
                     <?php $home_explore_locations = array_slice(RL_Locations::get_all_public(), 0, 3); ?>
+
+                    <div class="rl-entries-badge" id="rl-header-entries-badge" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>">
+                        <span class="dashicons dashicons-tickets-alt"></span>
+                        <span id="rl-header-entries-count"><?php echo intval($active_entries_count); ?></span>
+                        <span id="rl-header-entries-label"><?php echo esc_html($active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural')); ?></span>
+                    </div>
 
                     <?php if ($home_explore_locations): ?>
 

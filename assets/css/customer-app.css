@@ -2758,6 +2758,7 @@ LOGIN PAGE
 
 .rl-quick-action {
   all: unset;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2766,6 +2767,26 @@ LOGIN PAGE
   border-radius: 16px;
   background: var(--rl-brand-teal-light, #ccfbf1);
   cursor: pointer;
+  text-align: center;
+}
+
+/* Corner count badge — currently just the Entries quick-action, but
+   generic enough to reuse on any other .rl-quick-action later.
+   Hidden via inline style when the count is zero, same convention as
+   .rl-entries-badge. */
+.rl-quick-action-count {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #0f766e;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
   text-align: center;
 }
 

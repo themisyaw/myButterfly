@@ -49,6 +49,7 @@ return array(
     'home_quick_scan'          => array('en' => 'Scan QR', 'nl' => 'QR scannen'),
     'home_quick_prizes'        => array('en' => 'Prizes', 'nl' => 'Prijzen'),
     'home_quick_invite'        => array('en' => 'Invite', 'nl' => 'Uitnodigen'),
+    'home_quick_entries'       => array('en' => 'Entries', 'nl' => 'Deelnames'),
     'home_next_reward'         => array('en' => 'Next', 'nl' => 'Volgende'),
     'home_ready_to_redeem'     => array('en' => 'Ready to redeem now', 'nl' => 'Nu al in te wisselen'),
     'home_shared_across'       => array('en' => 'Shared across all', 'nl' => 'Gedeeld over alle'),
