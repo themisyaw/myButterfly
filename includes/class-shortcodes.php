@@ -2364,20 +2364,20 @@ $parts = explode('.', number_format($points, 2, '.', ''));
             <div class="rl-quick-actions">
                 <a href="<?php echo esc_url(site_url('/my-entries')); ?>" class="rl-quick-action" id="rl-quick-action-entries">
                     <span class="dashicons dashicons-tickets-alt"></span>
-                    <span><?php echo esc_html(rl_t('home_quick_entries')); ?></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_entries')); ?></span>
                     <span class="rl-quick-action-count" id="rl-quick-action-entries-count" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>"><?php echo intval($active_entries_count); ?></span>
                 </a>
                 <button type="button" class="rl-quick-action" data-tab="prizes">
                     <span class="dashicons dashicons-tickets-alt"></span>
-                    <span><?php echo esc_html(rl_t('home_quick_prizes')); ?></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_prizes')); ?></span>
                 </button>
                 <button type="button" class="rl-quick-action" data-tab="restaurants">
                     <span class="dashicons dashicons-location-alt"></span>
-                    <span><?php echo esc_html(rl_t('nav_restaurants')); ?></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('nav_restaurants')); ?></span>
                 </button>
                 <button type="button" class="rl-quick-action" data-tab="invite">
                     <span class="dashicons dashicons-groups"></span>
-                    <span><?php echo esc_html(rl_t('home_quick_invite')); ?></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_invite')); ?></span>
                 </button>
             </div>
 

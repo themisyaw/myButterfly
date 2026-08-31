@@ -2797,7 +2797,7 @@ LOGIN PAGE
   color: var(--rl-brand-teal-dark, #0f766e);
 }
 
-.rl-quick-action span:last-child {
+.rl-quick-action-label {
   font-size: 10.5px;
   font-weight: 700;
   color: var(--rl-brand-teal-dark, #0f766e);
