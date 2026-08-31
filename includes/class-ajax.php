@@ -555,11 +555,10 @@ class RL_Ajax
         }
 
         wp_send_json(array(
-            'success'             => true,
-            'total_points'        => round($total_points, 2),
-            'wallets'             => $wallets,
-            'active_entries'      => $active_entries_count,
-            'entries_label'       => $active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural'),
+            'success'        => true,
+            'total_points'   => round($total_points, 2),
+            'wallets'        => $wallets,
+            'active_entries' => $active_entries_count,
         ));
 
     }

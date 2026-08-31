@@ -2623,12 +2623,6 @@ $parts = explode('.', number_format($points, 2, '.', ''));
 
                     <?php $home_explore_locations = array_slice(RL_Locations::get_all_public(), 0, 3); ?>
 
-                    <div class="rl-entries-badge" id="rl-header-entries-badge" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>">
-                        <span class="dashicons dashicons-tickets-alt"></span>
-                        <span id="rl-header-entries-count"><?php echo intval($active_entries_count); ?></span>
-                        <span id="rl-header-entries-label"><?php echo esc_html($active_entries_count == 1 ? rl_t('entries_entry_singular') : rl_t('entries_entry_plural')); ?></span>
-                    </div>
-
                     <?php if ($home_explore_locations): ?>
 
                         <div class="rl-page-title">

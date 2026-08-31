@@ -186,27 +186,8 @@ function refreshHomePoints(){
 
         });
 
-        let entriesBadge = document.getElementById("rl-header-entries-badge");
-        let entriesCount = document.getElementById("rl-header-entries-count");
-        let entriesLabel = document.getElementById("rl-header-entries-label");
         let quickActionCount = document.getElementById("rl-quick-action-entries-count");
         let activeEntries = Number(data.active_entries || 0);
-
-        if(entriesBadge && entriesCount && entriesLabel){
-
-            if(activeEntries > 0){
-
-                entriesCount.textContent = activeEntries;
-                entriesLabel.textContent = data.entries_label || "";
-                entriesBadge.style.display = "";
-
-            } else {
-
-                entriesBadge.style.display = "none";
-
-            }
-
-        }
 
         if(quickActionCount){
 
