@@ -299,6 +299,78 @@ class RL_Shortcodes
     }
 
     /**
+     * The "Entries / Prizes / Restaurants / Invite" quick-action row
+     * shown just under the header — originally Home-tab-only, now
+     * shared so standalone pages (My Entries, Support, ...) get it
+     * too. $standalone controls how Prizes/Restaurants/Invite behave:
+     * on the Home tab itself (default, $standalone=false) they're
+     * data-tab buttons that switch sections instantly via
+     * customer-tabs.js, with no page reload; on every other page
+     * there's no in-page tab to switch, so they're plain links back
+     * to "/#prizes" etc. instead — the same #hash convention
+     * render_bottom_nav() already uses, which customer-tabs.js picks
+     * up on load to auto-select that tab. The Entries button/count is
+     * identical either way, since it's always a real link to
+     * /my-entries.
+     */
+    private function render_quick_actions($standalone = false)
+    {
+        $customer_id = $this->current_customer_id();
+
+        $active_entries_count = 0;
+
+        if ($customer_id) {
+            foreach (RL_Draws::get_customer_active_entries($customer_id) as $entry_row) {
+                $active_entries_count += intval($entry_row->entry_count);
+            }
+        }
+
+        $prizes_url      = $standalone ? esc_url(site_url('/#prizes')) : '';
+        $restaurants_url = $standalone ? esc_url(site_url('/#restaurants')) : '';
+        $invite_url      = $standalone ? esc_url(site_url('/#invite')) : '';
+
+        ob_start();
+        ?>
+        <div class="rl-quick-actions">
+            <a href="<?php echo esc_url(site_url('/my-entries')); ?>" class="rl-quick-action" id="rl-quick-action-entries">
+                <span class="dashicons dashicons-tickets-alt"></span>
+                <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_entries')); ?></span>
+                <span class="rl-quick-action-count" id="rl-quick-action-entries-count" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>"><?php echo intval($active_entries_count); ?></span>
+            </a>
+
+            <?php if ($standalone): ?>
+                <a href="<?php echo $prizes_url; ?>" class="rl-quick-action">
+                    <span class="dashicons dashicons-tickets-alt"></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_prizes')); ?></span>
+                </a>
+                <a href="<?php echo $restaurants_url; ?>" class="rl-quick-action">
+                    <span class="dashicons dashicons-location-alt"></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('nav_restaurants')); ?></span>
+                </a>
+                <a href="<?php echo $invite_url; ?>" class="rl-quick-action">
+                    <span class="dashicons dashicons-groups"></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_invite')); ?></span>
+                </a>
+            <?php else: ?>
+                <button type="button" class="rl-quick-action" data-tab="prizes">
+                    <span class="dashicons dashicons-tickets-alt"></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_prizes')); ?></span>
+                </button>
+                <button type="button" class="rl-quick-action" data-tab="restaurants">
+                    <span class="dashicons dashicons-location-alt"></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('nav_restaurants')); ?></span>
+                </button>
+                <button type="button" class="rl-quick-action" data-tab="invite">
+                    <span class="dashicons dashicons-groups"></span>
+                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_invite')); ?></span>
+                </button>
+            <?php endif; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
      * The same bottom nav used on the dashboard, for standalone pages
      * outside the tabbed SPA (e.g. a restaurant's own page). There
      * are no in-page tabs to switch here, so each button is a plain
@@ -831,6 +903,8 @@ class RL_Shortcodes
         <div class="rl-dashboard rl-restaurant-page-wrap">
 
             <?php echo $this->render_page_header(); ?>
+
+            <?php echo $this->render_quick_actions(true); ?>
 
             <div class="rl-explore-page">
 
@@ -2033,6 +2107,8 @@ class RL_Shortcodes
 
             <a href="<?php echo esc_url(site_url('/')); ?>" class="rl-page-back-btn" aria-label="Back">&larr;</a>
 
+            <?php echo $this->render_quick_actions(true); ?>
+
             <div class="rl-explore-page">
 
                 <div class="rl-page-title">
@@ -2235,19 +2311,6 @@ class RL_Shortcodes
 
 
 
-
-        // Sum of entry_count across every draw this customer currently
-        // has entries in — reuses the exact same "active" definition
-        // (status='active' AND within the date window) that the My
-        // Entries page's Active/Ended split already uses, rather than
-        // a second copy of that logic. A draw that ends drops its
-        // entries out of this count on its own (they just stop
-        // matching that WHERE clause); a deleted draw's entries are
-        // now explicitly removed by RL_Draws::delete() too.
-        $active_entries_count = 0;
-        foreach (RL_Draws::get_customer_active_entries($customer->id) as $entry_row) {
-            $active_entries_count += intval($entry_row->entry_count);
-        }
 
         /*
         =========================
@@ -2492,25 +2555,7 @@ $parts = explode('.', number_format($points, 2, '.', ''));
 
 
 
-            <div class="rl-quick-actions">
-                <a href="<?php echo esc_url(site_url('/my-entries')); ?>" class="rl-quick-action" id="rl-quick-action-entries">
-                    <span class="dashicons dashicons-tickets-alt"></span>
-                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_entries')); ?></span>
-                    <span class="rl-quick-action-count" id="rl-quick-action-entries-count" style="<?php echo $active_entries_count > 0 ? '' : 'display:none;'; ?>"><?php echo intval($active_entries_count); ?></span>
-                </a>
-                <button type="button" class="rl-quick-action" data-tab="prizes">
-                    <span class="dashicons dashicons-tickets-alt"></span>
-                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_prizes')); ?></span>
-                </button>
-                <button type="button" class="rl-quick-action" data-tab="restaurants">
-                    <span class="dashicons dashicons-location-alt"></span>
-                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('nav_restaurants')); ?></span>
-                </button>
-                <button type="button" class="rl-quick-action" data-tab="invite">
-                    <span class="dashicons dashicons-groups"></span>
-                    <span class="rl-quick-action-label"><?php echo esc_html(rl_t('home_quick_invite')); ?></span>
-                </button>
-            </div>
+            <?php echo $this->render_quick_actions(false); ?>
 
             <div id="rl-home-tab" class="rl-tab active">
 
