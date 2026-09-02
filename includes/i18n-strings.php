@@ -167,6 +167,8 @@ return array(
     'settings_view'               => array('en' => 'View', 'nl' => 'Bekijken'),
 
     // Support page (/support)
+    'support_title'               => array('en' => 'Support', 'nl' => 'Ondersteuning'),
+    'support_subtitle'            => array('en' => 'Tell us what\'s wrong or what you\'d like to see — it goes straight to us.', 'nl' => 'Laat ons weten wat er mis is of wat je zou willen zien — het komt direct bij ons terecht.'),
     'support_subject_label'       => array('en' => 'Subject', 'nl' => 'Onderwerp'),
     'support_message_label'       => array('en' => 'Message', 'nl' => 'Bericht'),
     'support_submit'              => array('en' => 'Send message', 'nl' => 'Bericht versturen'),

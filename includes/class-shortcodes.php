@@ -2035,6 +2035,13 @@ class RL_Shortcodes
 
             <div class="rl-explore-page">
 
+                <div class="rl-page-title">
+                    <div class="rl-title-content">
+                        <h3><?php echo esc_html(rl_t('support_title')); ?></h3>
+                        <p><?php echo esc_html(rl_t('support_subtitle')); ?></p>
+                    </div>
+                </div>
+
                 <div class="rl-login-card" style="margin:20px auto 0;">
 
                     <?php if ($submitted): ?>
