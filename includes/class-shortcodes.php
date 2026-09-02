@@ -2027,44 +2027,51 @@ class RL_Shortcodes
         ob_start();
         ?>
 
-        <a href="<?php echo esc_url(site_url('/')); ?>" class="rl-page-back-btn" aria-label="Back">&larr;</a>
+        <div class="rl-dashboard rl-restaurant-page-wrap">
 
-        <div class="rl-login-page">
+            <?php echo $this->render_page_header(); ?>
 
-            <div class="rl-login-card">
+            <a href="<?php echo esc_url(site_url('/')); ?>" class="rl-page-back-btn" aria-label="Back">&larr;</a>
 
-                <?php if ($submitted): ?>
+            <div class="rl-explore-page">
 
-                    <p class="rl-alert rl-alert-success"><?php echo esc_html(rl_t('support_sent')); ?></p>
+                <div class="rl-login-card" style="margin:20px auto 0;">
 
-                <?php else: ?>
+                    <?php if ($submitted): ?>
 
-                    <?php if (!empty($error_message)): ?>
-                        <p class="rl-alert rl-alert-error"><?php echo esc_html($error_message); ?></p>
+                        <p class="rl-alert rl-alert-success"><?php echo esc_html(rl_t('support_sent')); ?></p>
+
+                    <?php else: ?>
+
+                        <?php if (!empty($error_message)): ?>
+                            <p class="rl-alert rl-alert-error"><?php echo esc_html($error_message); ?></p>
+                        <?php endif; ?>
+
+                        <form method="post">
+
+                            <?php wp_nonce_field('rl_support_action', 'rl_support_nonce'); ?>
+
+                            <div class="rl-input-group">
+                                <input type="text" name="subject" placeholder="<?php echo esc_attr(rl_t('support_subject_label')); ?>" value="<?php echo esc_attr($subject_value); ?>" required maxlength="150">
+                            </div>
+
+                            <div class="rl-input-group">
+                                <textarea name="message" placeholder="<?php echo esc_attr(rl_t('support_message_label')); ?>" rows="6" required><?php echo esc_textarea($message_value); ?></textarea>
+                            </div>
+
+                            <button type="submit" name="rl_support_submit" class="rl-btn-primary" style="width:100%;"><?php echo esc_html(rl_t('support_submit')); ?></button>
+
+                        </form>
+
                     <?php endif; ?>
 
-                    <form method="post">
-
-                        <?php wp_nonce_field('rl_support_action', 'rl_support_nonce'); ?>
-
-                        <div class="rl-input-group">
-                            <input type="text" name="subject" placeholder="<?php echo esc_attr(rl_t('support_subject_label')); ?>" value="<?php echo esc_attr($subject_value); ?>" required maxlength="150">
-                        </div>
-
-                        <div class="rl-input-group">
-                            <textarea name="message" placeholder="<?php echo esc_attr(rl_t('support_message_label')); ?>" rows="6" required><?php echo esc_textarea($message_value); ?></textarea>
-                        </div>
-
-                        <button type="submit" name="rl_support_submit" class="rl-btn-primary" style="width:100%;"><?php echo esc_html(rl_t('support_submit')); ?></button>
-
-                    </form>
-
-                <?php endif; ?>
+                </div>
 
             </div>
 
         </div>
 
+        <?php echo $this->render_bottom_nav(); ?>
         <?php
         return ob_get_clean();
     }
