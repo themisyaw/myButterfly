@@ -863,7 +863,8 @@ html, body {
                     'manage-menu',
                     'manage-draws',
                     'privacy-policy',
-                    'verify-email'
+                    'verify-email',
+                    'support'
                 )
             )
             &&
