@@ -88,6 +88,10 @@ class RL_Activator
                 'title'   => 'Verify Email',
                 'content' => '[rl_verify_email]',
             ),
+            'support' => array(
+                'title'   => 'Support',
+                'content' => '[rl_support]',
+            ),
         );
 
         foreach ($pages as $slug => $page_data) {

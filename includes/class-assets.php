@@ -25,6 +25,24 @@ class RL_Assets
     $user = wp_get_current_user();
 
 
+    // A user can hold more than one role at once (e.g. an
+    // administrator who is *also* set as a brand's manager, for
+    // testing or because they genuinely run that restaurant
+    // themselves) — administrator must always win that combination,
+    // never get redirected out of wp-admin just because
+    // brand_manager also happens to be in the list.
+    if(
+        in_array(
+            'administrator',
+            $user->roles
+        )
+    ){
+
+        return;
+
+    }
+
+
     if(
         in_array(
             'customer',
@@ -332,7 +350,8 @@ class RL_Assets
                     'manage-menu',
                     'manage-draws',
                     'privacy-policy',
-                    'verify-email'
+                    'verify-email',
+                    'support'
                 )
             )
         ){
@@ -526,7 +545,8 @@ if(
                     'restaurant',
                     'my-entries',
                     'privacy-policy',
-                    'verify-email'
+                    'verify-email',
+                    'support'
                 )
             )
         ){

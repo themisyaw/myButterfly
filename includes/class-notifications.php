@@ -158,6 +158,47 @@ class RL_Notifications
     }
 
     /**
+     * The recipient for support/bug-report messages from the Settings
+     * page — a fixed inbox, not a wp-admin setting, since there's
+     * only one person reading it right now. Kept as a single named
+     * constant so there's exactly one place to change if that ever
+     * needs to become configurable.
+     */
+    const SUPPORT_EMAIL = 'themisspyridhs@gmail.com';
+
+    /**
+     * Sends a customer's Settings > Support submission. Name/email
+     * always come from the logged-in $user object, never from request
+     * input, so the "From" identity in the email body can't be
+     * spoofed — only the subject/message are customer-supplied (and
+     * already sanitized by the caller). Reply-To is set to the
+     * customer's own address so replying in a normal mail client goes
+     * straight back to them.
+     */
+    public static function send_support_email($user, $subject, $message)
+    {
+        if (!$user || empty($user->user_email)) {
+            return false;
+        }
+
+        $email_subject = 'Butterfly support: ' . $subject;
+
+        $body  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;">';
+        $body .= '<h2 style="color:#0f766e;margin-bottom:4px;">New support message</h2>';
+        $body .= '<p style="font-size:13px;color:#6b7280;">From <strong>' . esc_html($user->display_name) . '</strong> &lt;' . esc_html($user->user_email) . '&gt;</p>';
+        $body .= '<p style="font-size:15px;color:#111827;"><strong>' . esc_html($subject) . '</strong></p>';
+        $body .= '<p style="font-size:15px;color:#374151;background:#f8fafc;padding:14px;border-radius:12px;white-space:pre-line;">' . esc_html($message) . '</p>';
+        $body .= '</div>';
+
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+            'Reply-To: ' . $user->display_name . ' <' . $user->user_email . '>',
+        );
+
+        return wp_mail(self::SUPPORT_EMAIL, $email_subject, $body, $headers);
+    }
+
+    /**
      * Generic branded email for the admin notification composer —
      * unlike send_winner_email() there's no draw/restaurant context
      * here, just whatever title/body the admin typed, wrapped in the

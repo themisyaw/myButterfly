@@ -24,6 +24,7 @@ return array(
     'nav_activity'     => array('en' => 'Activity', 'nl' => 'Activiteit'),
     'nav_invite'       => array('en' => 'Invite friends', 'nl' => 'Vrienden uitnodigen'),
     'nav_settings'     => array('en' => 'Settings', 'nl' => 'Instellingen'),
+    'nav_support'      => array('en' => 'Support', 'nl' => 'Ondersteuning'),
     'nav_logout'       => array('en' => 'Logout', 'nl' => 'Uitloggen'),
     'nav_home'         => array('en' => 'Home', 'nl' => 'Home'),
     'nav_scan'         => array('en' => 'Scan', 'nl' => 'Scannen'),
@@ -164,6 +165,14 @@ return array(
     'settings_privacy_policy'    => array('en' => 'Privacy & Cookie Policy', 'nl' => 'Privacy- en cookiebeleid'),
     'settings_privacy_body'      => array('en' => 'What we collect and why.', 'nl' => 'Wat we verzamelen en waarom.'),
     'settings_view'               => array('en' => 'View', 'nl' => 'Bekijken'),
+
+    // Support page (/support)
+    'support_subject_label'       => array('en' => 'Subject', 'nl' => 'Onderwerp'),
+    'support_message_label'       => array('en' => 'Message', 'nl' => 'Bericht'),
+    'support_submit'              => array('en' => 'Send message', 'nl' => 'Bericht versturen'),
+    'support_sent'                => array('en' => 'Thanks — your message has been sent.', 'nl' => 'Bedankt — je bericht is verzonden.'),
+    'support_error_required'      => array('en' => 'Please fill in both subject and message.', 'nl' => 'Vul zowel het onderwerp als het bericht in.'),
+    'support_error_send_failed'   => array('en' => 'Could not send your message — please try again.', 'nl' => 'Je bericht kon niet worden verzonden — probeer het opnieuw.'),
 
     // Login / Register / Password
     'login_welcome_back'    => array('en' => 'Welcome back', 'nl' => 'Welkom terug'),

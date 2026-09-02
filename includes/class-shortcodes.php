@@ -90,6 +90,14 @@ class RL_Shortcodes
             )
         );
 
+        add_shortcode(
+            'rl_support',
+            array(
+                $this,
+                'support_page'
+            )
+        );
+
 
     }
 
@@ -334,6 +342,11 @@ class RL_Shortcodes
             <a class="rl-sheet-item" href="<?php echo esc_url(site_url('/#settings')); ?>">
                 <span class="dashicons dashicons-admin-generic"></span>
                 <span><?php echo esc_html(rl_t('nav_settings')); ?></span>
+            </a>
+
+            <a class="rl-sheet-item" href="<?php echo esc_url(site_url('/support')); ?>">
+                <span class="dashicons dashicons-sos"></span>
+                <span><?php echo esc_html(rl_t('nav_support')); ?></span>
             </a>
 
             <a href="<?php echo esc_url(wp_logout_url(site_url('/login'))); ?>" class="rl-sheet-item">
@@ -1961,6 +1974,101 @@ class RL_Shortcodes
         return ob_get_clean();
     }
 
+    /**
+     * A simple "report a bug / contact support" form, reachable from
+     * Settings — always sends to the fixed address below (not a
+     * wp-admin setting; there's only one person reading this inbox
+     * right now). Name/email come from the logged-in account, never
+     * from user input, so what lands in the inbox can't be spoofed —
+     * only subject/message are customer-supplied.
+     */
+    public function support_page()
+    {
+        if (!is_user_logged_in()) {
+            wp_redirect(site_url('/login'));
+            exit;
+        }
+
+        $user          = wp_get_current_user();
+        $submitted     = false;
+        $error_message = '';
+        $subject_value = '';
+        $message_value = '';
+
+        if (isset($_POST['rl_support_submit'])) {
+
+            if (!isset($_POST['rl_support_nonce']) || !wp_verify_nonce($_POST['rl_support_nonce'], 'rl_support_action')) {
+
+                $error_message = 'Security check failed — please try again.';
+
+            } else {
+
+                $subject_value = sanitize_text_field($_POST['subject'] ?? '');
+                $message_value = sanitize_textarea_field($_POST['message'] ?? '');
+
+                if (empty($subject_value) || empty($message_value)) {
+
+                    $error_message = rl_t('support_error_required');
+
+                } elseif (class_exists('RL_Notifications') && RL_Notifications::send_support_email($user, $subject_value, $message_value)) {
+
+                    $submitted     = true;
+                    $subject_value = '';
+                    $message_value = '';
+
+                } else {
+
+                    $error_message = rl_t('support_error_send_failed');
+
+                }
+            }
+        }
+
+        ob_start();
+        ?>
+
+        <a href="<?php echo esc_url(site_url('/')); ?>" class="rl-page-back-btn" aria-label="Back">&larr;</a>
+
+        <div class="rl-login-page">
+
+            <div class="rl-login-card">
+
+                <?php if ($submitted): ?>
+
+                    <p class="rl-alert rl-alert-success"><?php echo esc_html(rl_t('support_sent')); ?></p>
+
+                <?php else: ?>
+
+                    <?php if (!empty($error_message)): ?>
+                        <p class="rl-alert rl-alert-error"><?php echo esc_html($error_message); ?></p>
+                    <?php endif; ?>
+
+                    <form method="post">
+
+                        <?php wp_nonce_field('rl_support_action', 'rl_support_nonce'); ?>
+
+                        <div class="rl-input-group">
+                            <input type="text" name="subject" placeholder="<?php echo esc_attr(rl_t('support_subject_label')); ?>" value="<?php echo esc_attr($subject_value); ?>" required maxlength="150">
+                        </div>
+
+                        <div class="rl-input-group">
+                            <textarea name="message" placeholder="<?php echo esc_attr(rl_t('support_message_label')); ?>" rows="6" required><?php echo esc_textarea($message_value); ?></textarea>
+                        </div>
+
+                        <button type="submit" name="rl_support_submit" class="rl-btn-primary" style="width:100%;"><?php echo esc_html(rl_t('support_submit')); ?></button>
+
+                    </form>
+
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
+        <?php
+        return ob_get_clean();
+    }
+
 
 
 
@@ -2245,6 +2353,15 @@ class RL_Shortcodes
         <span><?php echo esc_html(rl_t('nav_settings')); ?></span>
 
     </button>
+
+
+    <a class="rl-sheet-item" href="<?php echo esc_url(site_url('/support')); ?>">
+
+        <span class="dashicons dashicons-sos"></span>
+
+        <span><?php echo esc_html(rl_t('nav_support')); ?></span>
+
+    </a>
 
 
     <a href="<?php echo esc_url( wp_logout_url( site_url('/login') ) ); ?>"  class="rl-sheet-item">
@@ -2985,6 +3102,7 @@ $parts = explode('.', number_format($points, 2, '.', ''));
             <a href="<?php echo esc_url(site_url('/privacy-policy')); ?>" class="rl-btn-secondary"><?php echo esc_html(rl_t('settings_view')); ?></a>
         </div>
     </div>
+
 
 </div>
 
