@@ -2105,8 +2105,6 @@ class RL_Shortcodes
 
             <?php echo $this->render_page_header(); ?>
 
-            <a href="<?php echo esc_url(site_url('/')); ?>" class="rl-page-back-btn" aria-label="Back">&larr;</a>
-
             <?php echo $this->render_quick_actions(true); ?>
 
             <div class="rl-explore-page">
