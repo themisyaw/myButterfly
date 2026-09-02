@@ -2077,23 +2077,42 @@ class RL_Shortcodes
 
             } else {
 
-                $subject_value = sanitize_text_field($_POST['subject'] ?? '');
-                $message_value = sanitize_textarea_field($_POST['message'] ?? '');
+                // Cheap per-account throttle so a compromised/spammy
+                // account can't flood the support inbox — same
+                // transient-based pattern already used for the
+                // scanner AJAX endpoints (RL_Ajax::rate_limit()),
+                // just a far lower ceiling since this is a human
+                // filling out a form, not a staff device scanning
+                // dozens of customers a minute.
+                $rate_limit_key   = 'rl_support_rate_' . $user->ID;
+                $rate_limit_count = (int) get_transient($rate_limit_key);
 
-                if (empty($subject_value) || empty($message_value)) {
+                if ($rate_limit_count >= 3) {
 
-                    $error_message = rl_t('support_error_required');
-
-                } elseif (class_exists('RL_Notifications') && RL_Notifications::send_support_email($user, $subject_value, $message_value)) {
-
-                    $submitted     = true;
-                    $subject_value = '';
-                    $message_value = '';
+                    $error_message = rl_t('support_error_rate_limited');
 
                 } else {
 
-                    $error_message = rl_t('support_error_send_failed');
+                    $subject_value = sanitize_text_field($_POST['subject'] ?? '');
+                    $message_value = sanitize_textarea_field($_POST['message'] ?? '');
 
+                    if (empty($subject_value) || empty($message_value)) {
+
+                        $error_message = rl_t('support_error_required');
+
+                    } elseif (class_exists('RL_Notifications') && RL_Notifications::send_support_email($user, $subject_value, $message_value)) {
+
+                        set_transient($rate_limit_key, $rate_limit_count + 1, HOUR_IN_SECONDS);
+
+                        $submitted     = true;
+                        $subject_value = '';
+                        $message_value = '';
+
+                    } else {
+
+                        $error_message = rl_t('support_error_send_failed');
+
+                    }
                 }
             }
         }

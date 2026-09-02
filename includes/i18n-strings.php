@@ -175,6 +175,7 @@ return array(
     'support_sent'                => array('en' => 'Thanks — your message has been sent.', 'nl' => 'Bedankt — je bericht is verzonden.'),
     'support_error_required'      => array('en' => 'Please fill in both subject and message.', 'nl' => 'Vul zowel het onderwerp als het bericht in.'),
     'support_error_send_failed'   => array('en' => 'Could not send your message — please try again.', 'nl' => 'Je bericht kon niet worden verzonden — probeer het opnieuw.'),
+    'support_error_rate_limited'  => array('en' => 'You\'ve sent a few messages already — please wait a bit before sending another.', 'nl' => 'Je hebt al een paar berichten verstuurd — wacht even voor je nog een verstuurt.'),
 
     // Login / Register / Password
     'login_welcome_back'    => array('en' => 'Welcome back', 'nl' => 'Welkom terug'),
