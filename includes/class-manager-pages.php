@@ -29,6 +29,7 @@ class RL_Manager_Pages
         add_shortcode('rl_manage_brand', array($this, 'manage_brand_page'));
         add_shortcode('rl_manage_menu', array($this, 'manage_menu_page'));
         add_shortcode('rl_manage_draws', array($this, 'manage_draws_page'));
+        add_shortcode('rl_manage_customers', array($this, 'manage_customers_page'));
     }
 
     /**
@@ -111,6 +112,63 @@ class RL_Manager_Pages
 
         <?php
         return ob_get_clean();
+    }
+
+    /**
+     * A brand manager's own read-only customer list — every customer
+     * who has ever earned points at their brand, name + total points
+     * only, sorted highest first, with a count of how many total.
+     * Deliberately minimal (no email, no transaction history) — this
+     * is a quick-glance leaderboard, not a customer record; nothing
+     * here is editable.
+     */
+    public function manage_customers_page()
+    {
+        $this->require_brand_manager();
+
+        if (!current_user_can('manage_loyalty_points')) {
+            return '<p>You do not have permission.</p>';
+        }
+
+        $brand = RL_Brands::get_by_manager(get_current_user_id());
+
+        if (!$brand) {
+            return $this->render_page_shell('Customers', '', '<p>No brand is assigned to you yet. Contact an administrator.</p>');
+        }
+
+        $customers    = RL_Points::get_customer_totals_for_brand($brand->id);
+        $total_count  = count($customers);
+
+        ob_start();
+        ?>
+
+        <p class="rl-manage-hint"><?php echo intval($total_count); ?> customer<?php echo $total_count === 1 ? '' : 's'; ?> total, sorted by points</p>
+
+        <?php if ($customers): ?>
+
+            <div class="rl-manage-list">
+                <?php foreach ($customers as $index => $customer): ?>
+                    <div class="rl-manage-item-row">
+                        <div class="rl-manage-item-info">
+                            <strong>#<?php echo intval($index + 1); ?> <?php echo esc_html($customer->display_name); ?></strong>
+                        </div>
+                        <div class="rl-manage-item-actions">
+                            <span class="rl-manage-item-points"><?php echo intval($customer->total_points); ?> pts</span>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+        <?php else: ?>
+
+            <p class="rl-manage-hint">No customers have earned points here yet.</p>
+
+        <?php endif; ?>
+
+        <?php
+        $body = ob_get_clean();
+
+        return $this->render_page_shell('Customers', '', $body);
     }
 
     public function manage_brand_page()

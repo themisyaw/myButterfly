@@ -363,4 +363,54 @@ class RL_Points
             )
         );
     }
+
+    /**
+     * Every customer who has ever earned points at this brand (any of
+     * its locations), with their total balance there — one row per
+     * customer regardless of whether the brand pools points (a single
+     * 'brand'-scoped wallet) or keeps them per-location (summed across
+     * however many of the brand's locations that customer has a
+     * wallet at). Used by the brand manager's own customer list —
+     * deliberately just name + points, nothing else, so it stays a
+     * lightweight summary rather than exposing full customer records.
+     */
+    public static function get_customer_totals_for_brand($brand_id)
+    {
+        global $wpdb;
+
+        $brand_id = absint($brand_id);
+
+        if (!$brand_id) {
+            return array();
+        }
+
+        $wallets   = $wpdb->prefix . 'rl_customer_points';
+        $customers = $wpdb->prefix . 'rl_customers';
+        $users     = $wpdb->users;
+        $locations = $wpdb->prefix . 'rl_locations';
+
+        return $wpdb->get_results(
+            $wpdb->prepare(
+                "
+                SELECT
+                    c.id AS customer_id,
+                    u.display_name,
+                    SUM(w.points) AS total_points
+                FROM {$wallets} w
+                INNER JOIN {$customers} c ON c.id = w.customer_id
+                INNER JOIN {$users} u ON u.ID = c.user_id
+                WHERE
+                    (w.scope_type = 'brand' AND w.scope_id = %d)
+                    OR
+                    (w.scope_type = 'location' AND w.scope_id IN (
+                        SELECT id FROM {$locations} WHERE brand_id = %d
+                    ))
+                GROUP BY c.id
+                ORDER BY total_points DESC
+                ",
+                $brand_id,
+                $brand_id
+            )
+        );
+    }
 }

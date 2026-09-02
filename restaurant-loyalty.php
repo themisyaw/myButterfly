@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Restaurant Loyalty
  * Description: Digital loyalty points system for restaurants.
- * Version: 2.12.0
+ * Version: 2.13.0
  * Author: Your Name
  * Text Domain: restaurant-loyalty
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('RL_VERSION', '2.12.0');
+define('RL_VERSION', '2.13.0');
 
 define(
     'RL_PLUGIN_PATH',

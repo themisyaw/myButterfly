@@ -80,6 +80,10 @@ class RL_Activator
                 'title'   => 'Manage Lucky Draws',
                 'content' => '[rl_manage_draws]',
             ),
+            'manage-customers' => array(
+                'title'   => 'Manage Customers',
+                'content' => '[rl_manage_customers]',
+            ),
             'privacy-policy' => array(
                 'title'   => 'Privacy & Cookie Policy',
                 'content' => '[rl_privacy_policy]',

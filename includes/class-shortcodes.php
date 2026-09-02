@@ -498,6 +498,11 @@ class RL_Shortcodes
             <span>Reward Menus</span>
         </a>
 
+        <a href="<?php echo esc_url(site_url('/manage-customers')); ?>" class="rl-sheet-item">
+            <span class="dashicons dashicons-groups"></span>
+            <span>Customers</span>
+        </a>
+
         <?php
         // Lucky Draws is an opt-in extra feature, toggled per-brand
         // by an admin (RL_Brands_Admin's "Enable Lucky Draws for this

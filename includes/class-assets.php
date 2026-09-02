@@ -349,6 +349,7 @@ class RL_Assets
                     'manage-brand',
                     'manage-menu',
                     'manage-draws',
+                    'manage-customers',
                     'privacy-policy',
                     'verify-email',
                     'support'
@@ -645,6 +646,7 @@ if(
                     'manage-brand',
                     'manage-menu',
                     'manage-draws',
+                    'manage-customers',
                     ''
                 );
 
@@ -862,6 +864,7 @@ html, body {
                     'manage-brand',
                     'manage-menu',
                     'manage-draws',
+                    'manage-customers',
                     'privacy-policy',
                     'verify-email',
                     'support'
