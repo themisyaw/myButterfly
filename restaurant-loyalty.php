@@ -147,7 +147,8 @@ function rl_custom_reset_password_email($defaults, $key, $user_login, $user_data
     $body .= '<p style="font-size:15px;color:#111827;">Someone requested a password reset for the account: <strong>' . esc_html($user_login) . '</strong>.</p>';
     $body .= '<p style="font-size:15px;color:#111827;">If this was you, click below to choose a new password.</p>';
     $body .= '<p style="margin-top:20px;"><a href="' . esc_url($reset_url) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Reset Password</a></p>';
-    $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">If this wasn\'t you, you can safely ignore this email — your password won\'t change.</p>';
+    $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:20px;">If this wasn\'t you, you can safely ignore this email — your password won\'t change.</p>';
+    $body .= RL_Notifications::email_signature_html();
     $body .= '</div>';
 
     $defaults['message'] = $body;

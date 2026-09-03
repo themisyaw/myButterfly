@@ -19,6 +19,35 @@ if (!defined('ABSPATH')) {
 class RL_Notifications
 {
     /**
+     * Shared HTML signature block appended to every outbound branded
+     * email (winner/entry/custom notifications, email verification,
+     * password reset). Table-based layout — not flexbox — since this
+     * renders in real mail clients (Outlook's Word engine doesn't
+     * support flexbox), and the logo is referenced by URL rather than
+     * embedded as a data URI, since Outlook desktop also doesn't
+     * render inline base64 images. The image is served straight from
+     * the plugin's own assets folder, same pattern already used for
+     * the site favicon.
+     */
+    public static function email_signature_html()
+    {
+        $logo_url = RL_PLUGIN_URL . 'assets/images/email-logo.png';
+        $site_url = untrailingslashit(preg_replace('#^https?://#', '', site_url()));
+
+        $html  = '<div style="border-top:1px solid #e5e7eb;padding-top:14px;margin-top:24px;">';
+        $html .= '<table cellpadding="0" cellspacing="0" border="0"><tr>';
+        $html .= '<td style="vertical-align:middle;padding-right:10px;"><img src="' . esc_url($logo_url) . '" width="32" height="27" style="display:block;" alt="MyButterfly"></td>';
+        $html .= '<td style="vertical-align:middle;line-height:1.5;font-size:12px;color:#6b7280;font-family:Arial,Helvetica,sans-serif;">';
+        $html .= '<strong style="color:#0f766e;">MyButterfly</strong> &middot; Loyalty made simple<br>';
+        $html .= '<a href="' . esc_url(site_url('/')) . '" style="color:#0f766e;text-decoration:none;">' . esc_html($site_url) . '</a>';
+        $html .= '</td>';
+        $html .= '</tr></table>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    /**
      * Emails a draw's winner. Two templates: a platform-branded one
      * for the Butterfly-wide draw, and a restaurant-branded one that
      * names the brand/location for a brand- or location-scoped draw
@@ -80,7 +109,7 @@ class RL_Notifications
 
         $body .= '<p style="font-size:14px;color:#6b7280;">Check your My Entries page for details, or get in touch with the restaurant to arrange collecting your prize.</p>';
         $body .= '<p style="margin-top:20px;"><a href="' . esc_url($dashboard_url) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">View My Entries</a></p>';
-        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">Butterfly Loyalty</p>';
+        $body .= self::email_signature_html();
         $body .= '</div>';
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
@@ -149,7 +178,7 @@ class RL_Notifications
 
         $body .= '<p style="font-size:14px;color:#6b7280;">Keep earning points for more entries — check My Entries any time to see where you stand.</p>';
         $body .= '<p style="margin-top:20px;"><a href="' . esc_url(site_url('/my-entries')) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">View My Entries</a></p>';
-        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">Butterfly Loyalty</p>';
+        $body .= self::email_signature_html();
         $body .= '</div>';
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
@@ -232,7 +261,7 @@ class RL_Notifications
         $body .= '<p style="font-size:15px;color:#111827;">Hi ' . esc_html($user->display_name) . ',</p>';
         $body .= '<p style="font-size:15px;color:#374151;white-space:pre-line;">' . esc_html($body_text) . '</p>';
         $body .= '<p style="margin-top:20px;"><a href="' . esc_url(site_url('/')) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Open Butterfly</a></p>';
-        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">Butterfly Loyalty</p>';
+        $body .= self::email_signature_html();
         $body .= '</div>';
 
         $headers = array('Content-Type: text/html; charset=UTF-8');

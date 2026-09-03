@@ -380,7 +380,8 @@ class RL_Users
         $body .= '<p style="font-size:15px;color:#111827;">Hi ' . esc_html($user->display_name) . ',</p>';
         $body .= '<p style="font-size:15px;color:#111827;">Please confirm your email address to activate your Butterfly account.</p>';
         $body .= '<p style="margin-top:20px;"><a href="' . esc_url($verify_url) . '" style="background:#0f766e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Confirm Email</a></p>';
-        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:30px;">If you didn\'t create this account, you can safely ignore this email.</p>';
+        $body .= '<p style="font-size:12px;color:#9ca3af;margin-top:20px;">If you didn\'t create this account, you can safely ignore this email.</p>';
+        $body .= RL_Notifications::email_signature_html();
         $body .= '</div>';
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
