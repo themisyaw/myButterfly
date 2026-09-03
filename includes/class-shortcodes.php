@@ -1598,11 +1598,14 @@ class RL_Shortcodes
 
                     } else {
 
+                        // wp_signon() above already set the auth
+                        // cookie with remember=true — re-setting it
+                        // here with no $remember argument would
+                        // silently overwrite that with WordPress's
+                        // short default (~2 days), which is exactly
+                        // the bug that was making people get logged
+                        // out far sooner than "remember me" implies.
                         wp_set_current_user(
-                            $user->ID
-                        );
-
-                        wp_set_auth_cookie(
                             $user->ID
                         );
 

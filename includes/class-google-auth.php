@@ -214,7 +214,7 @@ class RL_Google_Auth
         }
 
         wp_set_current_user($user->ID);
-        wp_set_auth_cookie($user->ID);
+        wp_set_auth_cookie($user->ID, true);
 
         wp_redirect(site_url('/'));
         exit;

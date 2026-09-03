@@ -159,6 +159,35 @@ function rl_custom_reset_password_email($defaults, $key, $user_login, $user_data
 
 /*
 =========================
+EXTENDED "REMEMBER ME" SESSION LENGTH FOR CUSTOMERS
+This app is used like a PWA — customers open it from a home-screen
+icon, not by typing a URL and password every visit — so getting
+logged out and dropped back to a login screen every ~14 days
+(WordPress's default "remember me" cookie lifetime) is a bad
+experience. Customer logins already request remember=true; this
+just extends how long that cookie actually lasts, to about a year.
+Left at WordPress's normal default for brand_manager and
+administrator accounts, which handle more sensitive actions and are
+more likely used on shared/work devices.
+=========================
+*/
+
+add_filter('auth_cookie_expiration', function ($expiration, $user_id, $remember) {
+    if (!$remember) {
+        return $expiration;
+    }
+
+    $user = get_userdata($user_id);
+
+    if ($user && in_array('customer', (array) $user->roles, true)) {
+        return YEAR_IN_SECONDS;
+    }
+
+    return $expiration;
+}, 10, 3);
+
+/*
+=========================
 SAFETY NET: CUSTOMER IDENTITY
 Any user that ends up with the 'customer' role — whether through
 self-registration or being created/promoted directly from wp-admin
